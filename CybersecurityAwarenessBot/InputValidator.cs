@@ -2,7 +2,7 @@
 // This class handles all input validation for the chatbot.
 // It makes sure we don't crash on bad or empty inputs,
 // and provides helpful feedback to the user when something's wrong.
-// Written by: [Your Name]
+// Written by: [Lindokuhle Mtshali]
 
 using System;
 using System.Text.RegularExpressions;

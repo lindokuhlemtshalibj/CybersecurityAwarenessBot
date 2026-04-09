@@ -2,7 +2,7 @@
 // This class manages all the chatbot's responses.
 // It matches user questions to the correct cybersecurity topic
 // and returns a relevant, helpful answer.
-// Written by: [Your Name]
+// Written by: [Lindokuhle Mtshali]
 
 using System;
 using System.Collections.Generic;
