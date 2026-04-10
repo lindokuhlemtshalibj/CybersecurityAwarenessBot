@@ -2,10 +2,10 @@
 
 A console-based cybersecurity awareness chatbot built in C# for South African citizens.
 
-## 📋 About
+##  About
 This chatbot was developed as part of a project to educate South Africans about cybersecurity threats including phishing, malware, social engineering, and safe online practices.
 
-## 🚀 Features
+## Features
 - Voice greeting on launch
 - ASCII art header
 - Personalised interaction using the user's name
@@ -13,12 +13,12 @@ This chatbot was developed as part of a project to educate South Africans about 
 - Input validation with helpful error messages
 - Dark-themed console UI with colour formatting and typing effects
 
-## 🏃 How to Run
+##  How to Run
 1. Clone this repository
 2. Open in Visual Studio 2022
 3. Press F5 to run
 
-## ✅ CI Status
+##  CI Status
 ![Build Status](https://github.com/lindokuhlemtshalibj/CybersecurityAwarenessBot/actions/workflows/ci.yml/badge.svg)
 
 > Screenshot of successful CI run:
