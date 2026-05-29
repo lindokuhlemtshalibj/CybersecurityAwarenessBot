@@ -3,22 +3,26 @@
 // This file keeps things simple - it just starts the chatbot.
 // Written by: [lindokuhle Mtshali ]
 // Student Number: [ST10233093]
-// Date: April 2026
+// Date: May 2026
 
 using System;
+using System.Windows.Forms;
 
 namespace CybersecurityAwarenessBot
 {
-    class Program
+    static class Program
     {
-        static void Main(string[] args)
+        [STAThread]
+        static void Main()
         {
-            // Play the voice greeting when the app launches
+            Application.EnableVisualStyles();
+            Application.SetCompatibleTextRenderingDefault(false);
+
+            // Play the voice greeting before the GUI opens (same as Part 1)
             VoiceGreeting.Play();
 
-            // Start the chatbot
-            ChatBot bot = new ChatBot();
-            bot.Start();
+            // Launch the main GUI window
+            Application.Run(new UI.ChatBotForm());
         }
     }
 }

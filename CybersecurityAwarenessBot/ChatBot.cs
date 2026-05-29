@@ -8,85 +8,96 @@ using System;
 using System.Threading;
 using CybersecurityAwarenessBot.UI;
 using CybersecurityAwarenessBot.Responses;
+using CybersecurityAwarenessBot.Memory;
 
 namespace CybersecurityAwarenessBot
 {
     public class ChatBot
     {
-        // Stores the user's name so we can personalise the conversation
-        private string _userName = "";
+        // ── Fields ───────────────────────────────────────────────────────────────
+        private readonly UserMemory _memory;
+        private readonly ResponseHandler _responseHandler;
+        private bool _nameHasBeenSet = false;
 
-        // This is the main method that runs the whole chatbot experience
-        public void Start()
+        // ── Constructor ──────────────────────────────────────────────────────────
+        public ChatBot()
         {
-            // Show the ASCII art header first
-            ConsoleHelper.DisplayHeader();
-
-            // Greet the user and ask for their name
-            GetUserName();
-
-            // Show a personalised welcome message after getting their name
-            ConsoleHelper.ShowWelcomeMessage(_userName);
-
-            // Start the main chat loop
-            RunChatLoop();
+            _memory = new UserMemory();
+            _responseHandler = new ResponseHandler(_memory);
         }
 
-        // Asks the user for their name and stores it
-        private void GetUserName()
-        {
-            ConsoleHelper.TypeText("\n Welcome! I'm CyberGuard, your Cybersecurity Awareness Assistant.");
-            ConsoleHelper.TypeText(" Before we begin, may I ask your name? ");
-            Console.Write("\n  >>> ");
-            Console.ForegroundColor = ConsoleColor.Cyan;
-            _userName = Console.ReadLine()?.Trim() ?? "";
-            Console.ResetColor();
+        // ── Public Properties ────────────────────────────────────────────────────
 
-            // Keep asking until we get a valid name
-            while (!InputValidator.IsValidName(_userName))
+        /// <summary>Returns the remembered user name, or string.Empty if not yet set.</summary>
+        public string UserName
+        {
+            get
             {
-                ConsoleHelper.ShowError(" Please enter a valid name (letters only, no numbers or symbols).");
-                Console.Write("\n  >>> ");
-                Console.ForegroundColor = ConsoleColor.Cyan;
-                _userName = Console.ReadLine()?.Trim() ?? "";
-                Console.ResetColor();
+                string name = _memory.GetName();
+                return string.IsNullOrEmpty(name) ? string.Empty : name;
             }
         }
 
-        // The main conversation loop - keeps running until the user says goodbye
-        private void RunChatLoop()
+        /// <summary>True once the user has provided a valid name.</summary>
+        public bool IsNameSet => _nameHasBeenSet;
+
+        // ── Public Methods ───────────────────────────────────────────────────────
+
+        /// <summary>
+        /// Called when the user first provides their name.
+        /// Validates it, stores it in memory, and returns a welcome message.
+        /// Returns an error message string if the name is invalid.
+        /// </summary>
+        public string SetUserName(string nameInput)
         {
-            ResponseHandler responseHandler = new ResponseHandler(_userName);
-            bool isRunning = true;
-
-            while (isRunning)
+            if (!InputValidator.IsValidName(nameInput))
             {
-                // Display the input prompt
-                ConsoleHelper.ShowPrompt(_userName);
-                Console.ForegroundColor = ConsoleColor.Cyan;
-                string userInput = Console.ReadLine()?.Trim() ?? "";
-                Console.ResetColor();
-
-                // Validate the input before processing it
-                if (!InputValidator.IsValidInput(userInput))
-                {
-                    ConsoleHelper.ShowError(" I didn't quite understand that. Could you rephrase?");
-                    continue;
-                }
-
-                // Check if the user wants to exit
-                if (InputValidator.IsExitCommand(userInput))
-                {
-                    ConsoleHelper.ShowFarewell(_userName);
-                    isRunning = false;
-                    continue;
-                }
-
-                // Get and display the bot's response
-                string response = responseHandler.GetResponse(userInput);
-                ConsoleHelper.TypeText($"\n  [CyberGuard]: {response}");
-                ConsoleHelper.ShowDivider();
+                return "⚠ Please enter a valid name (letters only, no numbers or symbols).";
             }
+
+            // Capitalise properly
+            string cleaned = nameInput.Trim();
+            cleaned = char.ToUpper(cleaned[0]) + cleaned.Substring(1).ToLower();
+            _memory.Remember("name", cleaned);
+            _nameHasBeenSet = true;
+
+            return $"Welcome aboard, {cleaned}! \n\n" +
+                   $"I'm CyberGuard — your personal cybersecurity guide.\n" +
+                   $"Together we'll keep you safe in South Africa's digital landscape.\n\n" +
+                   $"You can ask me about passwords, phishing, malware, safe browsing, " +
+                   $"social engineering, public Wi-Fi, two-factor authentication, and much more.\n\n" +
+                   $"Type 'help' to see all available topics. Type 'exit' to end our session.";
+        }
+
+        /// <summary>
+        /// Processes a user message and returns the bot's response.
+        /// Handles exit commands, invalid input, and normal conversation.
+        /// </summary>
+        public string ProcessMessage(string userInput)
+        {
+            // Validate input
+            if (!InputValidator.IsValidInput(userInput))
+            {
+                return "⚠ I didn't quite get that. Could you rephrase?";
+            }
+
+            // Handle exit
+            if (InputValidator.IsExitCommand(userInput))
+            {
+                string name = _memory.GetName();
+                string displayName = string.IsNullOrEmpty(name) ? "there" : name;
+                return $"GOODBYE|Goodbye, {displayName}! Stay cyber-safe out there. \nRemember: Think before you click!";
+            }
+
+            // Get response from the response handler
+            return _responseHandler.GetResponse(userInput);
+        }
+
+        /// <summary>Resets the chatbot session (clears memory).</summary>
+        public void Reset()
+        {
+            _memory.Clear();
+            _nameHasBeenSet = false;
         }
     }
 }

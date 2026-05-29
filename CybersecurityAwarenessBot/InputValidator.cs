@@ -20,20 +20,18 @@ namespace CybersecurityAwarenessBot
             if (string.IsNullOrWhiteSpace(input))
                 return false;
 
-            // Input must be at least 1 real character
             if (input.Trim().Length < 1)
                 return false;
 
             return true;
         }
 
-        // Checks if a name only contains letters and spaces (no numbers or symbols)
+        // Checks if a name only contains letters and spaces
         public static bool IsValidName(string name)
         {
             if (string.IsNullOrWhiteSpace(name))
                 return false;
 
-            // Only allow letters and spaces in names
             return Regex.IsMatch(name.Trim(), @"^[a-zA-Z\s]+$");
         }
 
